@@ -32,7 +32,7 @@ class TimeDecayedSWFA(nn.Module):
     """
 
     def __init__(self, dim: int, num_heads: int = 4, log_tau_init: float = -2.0,
-                 max_distance_s: float = 10.0):
+                 max_distance_s: float = 10.0, multiscale_init: bool = True):
         super().__init__()
         assert dim % num_heads == 0
         self.dim = dim
@@ -43,8 +43,13 @@ class TimeDecayedSWFA(nn.Module):
         self.qkv = nn.Linear(dim, 3 * dim, bias=False)
         self.proj = nn.Linear(dim, dim, bias=False)
 
-        # Per-head log-tau (time scale in seconds); heads learn their own window.
-        self.log_tau = nn.Parameter(torch.full((num_heads,), log_tau_init))
+        # Per-head log-tau initialized to geometrically-spaced timescales so
+        # heads start specialized for different horizons (0.03s .. 3s range).
+        if multiscale_init:
+            init = torch.linspace(-3.5, 1.0, num_heads)
+        else:
+            init = torch.full((num_heads,), log_tau_init)
+        self.log_tau = nn.Parameter(init)
         self.max_distance_s = max_distance_s
 
     def effective_memory_s(self) -> torch.Tensor:
