@@ -7,6 +7,9 @@ a quant microstructure setting — the goal is not just a benchmark number,
 but an **interpretable per-head memory horizon** that aligns with
 microstructure research.
 
+📖 **[Deep-dive docs](docs/DEEP_DIVE.md)** — attention math, FLOP analysis,
+ablation protocol, results framing, and interview Q&A.
+
 ## What's novel
 
 Standard causal attention is O(N²) over tokens, indifferent to when they
